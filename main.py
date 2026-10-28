@@ -1,16 +1,13 @@
-
 from fastapi import FastAPI
 from pydantic import BaseModel
 import joblib
-import pandas as pd
 
 app = FastAPI()
 
-# Load the trained model
 model = joblib.load("linearmodel.pkl")
 
 
-class datascience(BaseModel):
+class DataScience(BaseModel):
     StudyHours: float
 
 
@@ -20,15 +17,6 @@ def test():
 
 
 @app.post("/predict")
-def datainsert(ds: datascience):
-    # Create DataFrame matching the trained feature name
-    input_data = pd.DataFrame({
-        "StudyHours": [ds.StudyHours]
-    })
-
-    # Predict marks
-    marks = model.predict(input_data)
-
-    return {
-        "predictionmarks": round(float(marks[0]), 2)
-    }
+def datainsert(ds: DataScience):
+    marks = model.predict([[ds.StudyHours]])
+    return {"predicted_marks": round(float(marks[0]), 2)}
